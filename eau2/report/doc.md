@@ -17,7 +17,7 @@ All keys know where their data is stored and can be used for searching the netwo
 The network contains a group of nodes, all connected to each other as well as a master server.
  
 Above the KV Store layer is the DataFrame layer. In this layer, calls to the KVStore layer allow all of the data to be put together.
-This layer provides an extra level of abstraction in the forms of DataFrames and distributed arrays.
+This layer provides an extra level of absraction in the forms of DataFrames and distributed arrays.
 Each DataFrame contains a set of distributed arrays.
 Distributed arrays are arrays split into fixed-size chunks. These chunks are then distributed across the network.
  
@@ -35,11 +35,13 @@ In the KV Store layer, we will have a single Server and a series of Clients. The
  
 **Use cases**
 Since we are in the early stages of development, our use cases are fairly small.
-Right now we can read a data file into a DataFram and perform an action on that DataFrame.
+Right now we can read a data file into a DataFrame and perform an action on that DataFrame.
 
  
 **Open questions**
- 
+We do not have any open questions at this time, we imagine some will come up as we move forward.
+
+
 **Status**
 At the moment, we have built most of the DataFrame layer.
 We are able to read data from a file, build a DataFrame from that file, and perform some small operations on that DataFrame.
