@@ -1,14 +1,12 @@
 // lang::CwC
 
-#ifndef Fielder_H
-#define Fielder_H
-
 #pragma once
 #include "helper.h"
 #include "object.h"
 #include "row.h"
 #include "string.h"
 
+class Row;
 
 /*****************************************************************************
  * Fielder::
@@ -39,35 +37,24 @@ class Fielder : public Object {
 
 class PrintFielder : public Fielder {
   public:
-    Row* r_;
-
-    PrintFielder(Row* r) {
-        r_ = r;
+    PrintFielder() {
     }
 
     /** Called for fields of the argument's type with the value of the field. */
     void accept(bool b) {
-        char a = ' ';
-        printf("%i", b);
-        printf("%c", a);
+        printf("%i ", b);
     }
     void accept(float f) {
-        char a = ' ';
-        printf("%f", f);
-        printf("%c", a);
+        printf("%f ", f);
     }
     void accept(int i) {
-        char a = ' ';
-        printf("%i", i);
-        printf("%c", a);
+        printf("%i ", i);
     }
     void accept(String* s) {
-        char a = ' ';
-        printf("%s", s->c_str());
-        printf("%c", a);
+        printf("%s ", s->c_str());
     }
     void start(size_t r) {
-        r_->visit(r, *this);
+        // r_->visit(r, *this);
     }
 
     void done() {

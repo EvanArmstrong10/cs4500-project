@@ -9,6 +9,10 @@
 #include "schema.h"
 #include "string.h"
 #include <thread>
+#include <chrono>
+#include <mutex>
+#include <condition_variable>
+
 
 /****************************************************************************
  * DataFrame::
@@ -17,7 +21,7 @@
  * holds values of the same type (I, S, B, F). A dataframe has a schema that
  * describes it.
  */
-class ModifiedDataFrame : public Object {
+class DataFrame : public Object {
 
   public:
     Schema* schema_;
@@ -27,7 +31,7 @@ class ModifiedDataFrame : public Object {
 
 
     /** Create a data frame with the same columns as the given df but no rows */
-    ModifiedDataFrame(ModifiedDataFrame& df) {
+    DataFrame(DataFrame& df) {
         Column** temp = new Column*[df.columns_];
         data_ = temp;
         columns_ = df.columns_;
@@ -37,11 +41,37 @@ class ModifiedDataFrame : public Object {
 
     /** Create a data frame from a schema and columns. Results are undefined if
      * the columns do not match the schema. */
-    ModifiedDataFrame(Schema& schema) {
+    DataFrame(Schema& schema) {
         schema_ = new Schema(schema);
         columns_ = schema.cols_;
-        data_ = new Column*[schema.cols_];
-        col_cap_ = schema.cols_;
+        if (schema.cols_ == 0)
+            col_cap_ = 2;
+        else
+            col_cap_ = schema.cols_;
+        data_ = new Column*[columns_];
+        for (int ii = 0; ii < columns_; ii++) {
+            char type = schema.col_type(ii);
+            switch (type) {
+            case 'I':
+                data_[ii] = new IntColumn();
+                break;
+            case 'B':
+                data_[ii] = new BoolColumn();
+                break;
+            case 'F':
+                data_[ii] = new FloatColumn();
+                break;
+            case 'S':
+                data_[ii] = new StringColumn();
+                break;
+            default:
+                break;
+            }
+        }
+    }
+
+    ~DataFrame() {
+        delete[] data_;
     }
 
     /** Returns the dataframe's schema. Modifying the schema after a dataframe
@@ -50,6 +80,7 @@ class ModifiedDataFrame : public Object {
         return *schema_;
     }
 
+    /** Checks if the data structure is at capacity. */
     bool at_capacity() {
         return col_cap_ <= columns_;
     }
@@ -62,7 +93,6 @@ class ModifiedDataFrame : public Object {
         }
         delete[] data_;
         data_ = temp;
-        delete[] temp;
     }
 
     /** Adds a column this dataframe, updates the schema, the new column
@@ -132,8 +162,9 @@ class ModifiedDataFrame : public Object {
      */
     void fill_row(size_t idx, Row& row) {
         exit_if_not(row.size_ == columns_, "Row doesn't match the schema");
-        for (int ii = 0; ii < columns_; ii++) {
-            char type = row.col_type(idx);
+        for (int ii = 0; ii < row.width(); ii++) {
+            char type = get_schema().col_type(ii);
+            row.set_idx(idx);
             switch (type) {
             case 'I': {
                 IntColumn* col = data_[ii]->as_int();
@@ -164,8 +195,11 @@ class ModifiedDataFrame : public Object {
     /** Add a row at the end of this dataframe. The row is expected to have
      *  the right schema and be filled with values, otherwise undedined.  */
     void add_row(Row& row) {
-        exit_if_not(row.size_ == columns_, "Row doesn't match schema");
-        for (int ii = 0; ii < row.size_; ii++) {
+        if (row.width() != columns_) {
+            puts("no no no");
+            return;
+        }
+        for (int ii = 0; ii < row.width(); ii++) {
             char type = row.col_type(ii);
             switch (type) {
             case 'I': {
@@ -192,88 +226,119 @@ class ModifiedDataFrame : public Object {
                 break;
             }
         }
-        schema_->add_row(nullptr);
+        schema_->add_row(nullptr); // change to blank string
     }
 
     /** The number of rows in the dataframe. */
     size_t nrows() {
-        return schema_->rows_;
+        return schema_->length();
     }
 
     /** The number of columns in the dataframe.*/
     size_t ncols() {
-        return schema_->cols_;
+        return schema_->width();
     }
 
     /** Visit rows in order */
     void map(Rower& r) {
-        Row& rtemp = *(new Row(*schema_));
+        Row row(*schema_);
         for (int ii = 0; ii < schema_->rows_; ii++) {
-            fill_row(ii, rtemp);
-            r.accept(rtemp);
+            fill_row(ii, row);
+            r.accept(row);
         }
     }
-
-
-    void pmap_help(Rower& r, size_t start, size_t end, std::mutex mtx) {
-        Row* rtemp = new Row(*schema_);
-        for (int ii = start; ii < end; ii++) {
-            fill_row(ii, *rtemp);
-            mtx.lock();
-            r.accept(*rtemp);
-            mtx.unlock();
-        }
-    }
-
-    /** This method clones the Rower and executes the map in parallel. Join is
-     * used at the end to merge the results. */
-    void pmap(Rower& r) {
-
-        size_t num_threads = 16;
-        std::thread* pool[num_threads];
-        Rower rowers[num_threads];
-
-        for (int ii = 0; ii < num_threads; ii++) {
-            pool[ii] = new std::thread(pmap_help);
-            rowers[ii] = r.clone();
-            std::mutex mtx;
-
-            int inc = nrows() / num_threads;
-
-            size_t start = inc * ii;
-            size_t end = inc * (ii + 1);
-
-            pool[ii]->start(rowers[ii], start, end, mtx);
-        }
-
-        for (int ii = 0; ii < 15; ii++) {
-        }
-        pool[ii].join->join();
-    }
-
 
     /** Create a new dataframe, constructed from rows for which the given Rower
      * returned true from its accept method. */
     DataFrame* filter(Rower& r) {
-        DataFrame* temp = new DataFrame(*schema_);
-        Row* rtemp = new Row(*schema_);
+        DataFrame* df = new DataFrame(*schema_);
+        Row row(*schema_);
         for (int ii = 0; ii < schema_->rows_; ii++) {
-            fill_row(ii, *rtemp);
-            if (r.accept(*rtemp)) {
-                temp->add_row(*rtemp);
+            fill_row(ii, row);
+            if (r.accept(row)) {
+                df->add_row(row);
             }
         }
-        delete rtemp;
-        return temp;
+        return df;
     }
 
     /** Print the dataframe in SoR format to standard output. */
     void print() {
-        /*
-        Fielder* f = new PrintFielder(this);
+        Row r(*schema_);
         for (int ii = 0; ii < schema_->rows_; ii++) {
-            f->start(ii);
+            fill_row(ii, r);
+            r.print();
         }
-        */
+    }
+};
+
+
+class ModifiedDataFrame : public DataFrame {
+
+  public:
+    // fields used for threading
+    size_t finished_thread_counter_;
+    std::condition_variable_any cv;
+    std::mutex cv_mtx;
+
+    // constant thread count
+    size_t NUM_THREADS_ = 8;
+
+
+    /** Create a data frame with the same columns as the given df but no rows */
+    ModifiedDataFrame(DataFrame& df) : DataFrame(df) {
+        finished_thread_counter_ = 0;
+    }
+
+    /** Create a data frame from a schema and columns. Results are undefined if
+     * the columns do not match the schema. */
+    ModifiedDataFrame(Schema& schema) : DataFrame(schema) {
+        finished_thread_counter_ = 0;
+    }
+
+    /** Visit rows starting from index start and ending at index end */
+    void thread_helper(Rower* r, size_t start, size_t end) {
+        Row row(*schema_);
+        for (size_t ii = start; ii < end; ii++) {
+            fill_row(ii, row);
+            r->accept(row);
+        }
+
+        // this thread has performed all necessary work, increment counter
+        finished_thread_counter_++;
+
+        // if all threads have completed, wake main thread
+        if (finished_thread_counter_ == NUM_THREADS_) cv.notify_all();
+    }
+
+    /** Visit rows in order */
+    void pmap(Rower& r) {
+        std::thread* threads[NUM_THREADS_];
+        Rower** rowers = new Rower*[NUM_THREADS_];
+
+        size_t increment = (schema_->rows_ / NUM_THREADS_) + 1;
+        size_t start = 0;
+        size_t end = increment;
+
+        // loop for spawning threads
+        for (int ii = 0; ii < NUM_THREADS_; ii++) {
+            rowers[ii] = dynamic_cast<Rower*>(r.clone());
+
+            // spawn thread into thread_helper
+            threads[ii] = new std::thread(&ModifiedDataFrame::thread_helper, this, rowers[ii], start, end);
+
+            start += increment;
+            end += increment;
+            if (end > schema_->rows_) end = schema_->rows_;
+        }
+
+        // wait for threads to perform work
+        cv.wait(cv_mtx);
+
+        // loop for clone and thread deletion
+        for (int ii = 0; ii < NUM_THREADS_; ii++) {
+            r.join_delete(rowers[ii]);
+            threads[ii]->join();
+        }
     }
 };
