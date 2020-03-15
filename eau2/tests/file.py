@@ -11,7 +11,11 @@ else:
     print("Please provide path where datafile should be created")
     exit(0)
 
-f = open(path, "w")
+try:
+    f = open(path, "w")
+except:
+    print("Could not create file or directory")
+    exit(1)
 
 
 ints = [1, 9, 34, 56, 24, 37, 92, 45, 54, 20, 34, 28, 10, 32, 72, 123]
