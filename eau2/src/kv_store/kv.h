@@ -44,7 +44,7 @@ class KV {
             
             for (int ii = 0; ii < size_; ii++) {
                 if (keys_[ii]->equals(key)) {
-                    DataFrame temp = DataFrame::fromArray(&keys_[ii], &this, keys_[ii]->val->size, keys_[ii]->val->vals);
+                    DataFrame temp = DataFrame::fromArray(&keys_[ii], this, keys_[ii]->val->size, keys_[ii]->val->vals);
                 }
             }
         }

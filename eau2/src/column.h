@@ -63,6 +63,7 @@ class Column : public Object {
         sys.exit_if_not(0, "Bad get_type call");
     }
 
+
     /** Return the type of this column as a char: 'S', 'B', 'I' and 'F'. */
     char get_type() {
         useful_get_type();
@@ -181,6 +182,7 @@ class IntColumn : public Column {
     void accept(Fielder visitor, size_t idx) {
         visitor.accept(get(idx));
     }
+
 };
 
 /*************************************************************************

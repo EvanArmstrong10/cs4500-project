@@ -12,6 +12,7 @@
 #include <chrono>
 #include <mutex>
 #include <condition_variable>
+#include "kv_store/kv.h"
 
 
 /****************************************************************************
@@ -28,6 +29,13 @@ class DataFrame : public Object {
     Column** data_;
     size_t columns_; // number of columns
     size_t col_cap_; // max number of columns df can hold before reallocation
+
+    DataFrame() {
+        data_ = new Column*[0];
+        columns_ = 0;
+        col_cap_ = 2;
+        schema_ = new Schema();
+    }
 
 
     /** Create a data frame with the same columns as the given df but no rows */
@@ -108,6 +116,52 @@ class DataFrame : public Object {
 
         schema_->add_column(x, name);
         columns_++;
+    }
+
+    static DataFrame* fromArray(Key key, KV kv, size_t size, Column* vals) {
+        DataFrame* df = new DataFrame();
+        df->add_column(vals, nullptr);
+        return df;
+    }
+
+    static DataFrame* fromArray(Key key, KV kv, size_t size, float* vals) {
+        DataFrame* df = new DataFrame();
+        FloatColumn* fcol = new FloatColumn();
+        for (int i = 0; i < size; i++) {
+            fc->push_back(vals[i]);
+        }
+        df->add_column(fc, nullptr);
+        return df;
+    }
+
+    static DataFrame* fromArray(Key key, KV kv, size_t size, int* vals) {
+        DataFrame* df = new DataFrame();
+        IntColumn* icol = new IntColumn();
+        for (int i = 0; i < size; i++) {
+            icol->push_back(vals[i]);
+        }
+        df->add_column(icol, nullptr);
+        return df;
+    }
+
+    static DataFrame* fromArray(Key key, KV kv, size_t size, bool* vals) {
+        DataFrame* df = new DataFrame();
+        BoolColumn* bcol = new BoolColumn();
+        for (int i = 0; i < size; i++) {
+            bcol->push_back(vals[i]);
+        }
+        df->add_column(bcol, nullptr);
+        return df;
+    }
+
+    static DataFrame* fromArray(Key key, KV kv, size_t size, String** vals) {
+        DataFrame* df = new DataFrame();
+        StringColumn* scol = new StringColumn();
+        for (int i = 0; i < size; i++) {
+            scol->push_back(vals[i]);
+        }
+        df->add_column(scol, nullptr);
+        return df;
     }
 
     /** Return the value at the given column and row. Accessing rows or

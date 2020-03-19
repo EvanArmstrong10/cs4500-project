@@ -16,8 +16,4 @@ class Value {
             size = col->size;
             vals = col;
         }
-
-        bool equals(Value* val) {
-            return size == val->size && vals == val->vals;
-        }
 };

@@ -23,6 +23,6 @@ class Key {
         }
 
         bool equals(Key* k) {
-            return name->equals(k->name) && node == k->node && val->equals(k->val);
+            return name->equals(k->name) && node == k->node;
         }
 };
