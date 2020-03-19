@@ -11,7 +11,8 @@ The eau2 system can be split into 3 layers:
    * KV Store layer
  
 The KV Store layer consists of a series of keys and values distributed across a network.
-All keys know where their data is stored and can be used for searching the network for the proper data.
+All keys know which node their data is stored on and can be used for searching the network for the proper data.
+All values consist of a column, the goal is to split a DataFrame's column into chunks to be stored across several key/value pairs.
 The network contains a group of client nodes connected to each other and a master node.
  
 Above the KV Store layer is the DataFrame layer. In this layer, calls to the KVStore layer allow data to be structured as an easily accessible DataFrame. To the user, the DataFrame is  stored in columnar format. Under the hood, each DataFrame contains a set of distributed arrays with data spread across multiple nodes of the KV layer. These distributed arrays are arrays split into fixed-size chunks to enable easy serialization and distribution across the network.
@@ -28,21 +29,27 @@ In the KV Store layer, we will have a single Server and a series of Clients. The
  
 ## Use cases
 Since we are in the early stages of development, our use cases are fairly small.
-Right now we can read a data file into a DataFrame and perform an action on that DataFrame. Data is not yet distributed or duplicated across nodes.
+Right now we can read a data file into a DataFrame and perform an action on that DataFrame.
+We can also create a DataFrame, store it in a single Key/Value pair, perform and action on it and return the same DataFrame by calling the key.
+Data is not yet distributed or duplicated across nodes.
  
 ## Open questions
 Which features of the Application will be built in to the system versus user built?
 How will data concurrency be ensured across nodes?
+Who has ownership of the DataFrame?
+How do we determine how the DataFrame is chunked into KV pairs?
 
 
 ## Status
 At the moment, we have built most of the DataFrame layer.
+We have also created a basic KV Store.
 We are able to read data from a file, build a DataFrame from that file, and perform some small operations on the resulting DataFrame.
+We can take that DataFrame, store it in a Key/Value pair and return it by accessing that pair.
  
 In terms of upcoming work, we still need to build a functioning network.
-The next step is building the distributed KV Store over that network and integrate it with our DataFrame structures.
+The next step is extending our current KV Store over multiple nodes in our network and integrate it with our DataFrame structures.
 Finally we need to put some work into the connection to the Application layer so the user can easily work with the system.
-We expect these 3 items to take a week each.
+We expect these remaining items to take a week each. However, getting our network to be functional might take some extra time.
 
 
 
