@@ -1,8 +1,11 @@
 //lang::CwC
 
+#pragma once
+#include "../dataframe.h"
 #include "key.h"
 #include "value.h"
-#include "../dataframe.h"
+
+class DataFrame;
 
 class KV {
 

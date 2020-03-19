@@ -7,6 +7,7 @@
 #include "string.h"
 #include <stdarg.h>
 
+class Sys;
 Sys sys;
 
 class IntColumn;

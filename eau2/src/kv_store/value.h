@@ -1,5 +1,6 @@
 //lang::CwC
 
+#pragma once
 #include "../column.h"
 
 class Value {

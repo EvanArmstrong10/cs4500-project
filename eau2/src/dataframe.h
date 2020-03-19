@@ -12,7 +12,10 @@
 #include <chrono>
 #include <mutex>
 #include <condition_variable>
+#include "kv_store/key.h"
 #include "kv_store/kv.h"
+
+class KV;
 
 
 /****************************************************************************

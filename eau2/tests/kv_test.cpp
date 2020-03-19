@@ -1,6 +1,7 @@
-//lang::C++
+//lang::CwC
 
 #include "../src/kv_store/kv.h"
+#include <assert.h>
 
 void testKey() {
 
