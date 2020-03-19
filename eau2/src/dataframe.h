@@ -128,9 +128,9 @@ class DataFrame : public Object {
         DataFrame* df = new DataFrame();
         FloatColumn* fcol = new FloatColumn();
         for (int i = 0; i < size; i++) {
-            fc->push_back(vals[i]);
+            fcol->push_back(vals[i]);
         }
-        df->add_column(fc, nullptr);
+        df->add_column(fcol, nullptr);
         return df;
     }
 

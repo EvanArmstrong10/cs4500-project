@@ -1,7 +1,6 @@
 //lang::CwC
 
 #include "../string.h"
-#include "value.h"
 
 
 class Key {
@@ -10,12 +9,10 @@ class Key {
 
         String* name;
         size_t node;
-        Value* val;
 
         Key(String* name, size_t node) {
             name = name;
             node = node;
-            val = new Value();
         }
 
         ~Key() {
