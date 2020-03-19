@@ -5,8 +5,9 @@ build:
 	tests/file.py data/datafile.txt
 
 test:
-	tests/test_serialize
+	tests/test_serialize.cpp
 	tests/test_sorer -f data/datafile.txt
+	
 
 valgrind:
 

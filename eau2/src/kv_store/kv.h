@@ -50,11 +50,10 @@ class KV {
         }
 
         DataFrame* get(Key* key) {
-            
             DataFrame* temp = new DataFrame();
             for (int ii = 0; ii < size_; ii++) {
                 if (keys_[ii]->equals(key)) {
-                    temp = DataFrame::fromArray(*keys_[ii], *this, vals_[ii]->size, vals_[ii]->vals);
+                    temp = DataFrame::fromArray(keys_[ii], this, vals_[ii]->size, vals_[ii]->vals);
                 }
             }
             return temp;

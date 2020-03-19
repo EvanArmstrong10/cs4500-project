@@ -7,10 +7,10 @@ class Key {
 
     public:
 
-        String* name;
+        const char* name;
         size_t node;
 
-        Key(String* name, size_t node) {
+        Key(const char* name, size_t node) {
             name = name;
             node = node;
         }
@@ -20,6 +20,6 @@ class Key {
         }
 
         bool equals(Key* k) {
-            return name->equals(k->name) && node == k->node;
+            return (strcmp(k->name, name) == 0) && node == k->node;
         }
 };

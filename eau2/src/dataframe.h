@@ -118,13 +118,13 @@ class DataFrame : public Object {
         columns_++;
     }
 
-    static DataFrame* fromArray(Key key, KV kv, size_t size, Column* vals) {
+    static DataFrame* fromArray(Key* key, KV* kv, size_t size, Column* vals) {
         DataFrame* df = new DataFrame();
         df->add_column(vals, nullptr);
         return df;
     }
 
-    static DataFrame* fromArray(Key key, KV kv, size_t size, float* vals) {
+    static DataFrame* fromArray(Key* key, KV* kv, size_t size, float* vals) {
         DataFrame* df = new DataFrame();
         FloatColumn* fcol = new FloatColumn();
         for (int i = 0; i < size; i++) {
@@ -134,7 +134,7 @@ class DataFrame : public Object {
         return df;
     }
 
-    static DataFrame* fromArray(Key key, KV kv, size_t size, int* vals) {
+    static DataFrame* fromArray(Key* key, KV* kv, size_t size, int* vals) {
         DataFrame* df = new DataFrame();
         IntColumn* icol = new IntColumn();
         for (int i = 0; i < size; i++) {
@@ -144,7 +144,7 @@ class DataFrame : public Object {
         return df;
     }
 
-    static DataFrame* fromArray(Key key, KV kv, size_t size, bool* vals) {
+    static DataFrame* fromArray(Key* key, KV* kv, size_t size, bool* vals) {
         DataFrame* df = new DataFrame();
         BoolColumn* bcol = new BoolColumn();
         for (int i = 0; i < size; i++) {
@@ -154,7 +154,7 @@ class DataFrame : public Object {
         return df;
     }
 
-    static DataFrame* fromArray(Key key, KV kv, size_t size, String** vals) {
+    static DataFrame* fromArray(Key* key, KV* kv, size_t size, String** vals) {
         DataFrame* df = new DataFrame();
         StringColumn* scol = new StringColumn();
         for (int i = 0; i < size; i++) {
