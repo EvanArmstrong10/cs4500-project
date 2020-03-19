@@ -17,3 +17,4 @@ clean:
 	rm tests/test_serialize
 	rm tests/test_sorer
 	rm data -r
+	rm tests/kv_test
