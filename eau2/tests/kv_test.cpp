@@ -49,6 +49,7 @@ void testKV() {
             fc->push_back(vals[i]);
             bc->push_back(vals1[i]);
     }
+
     Value v1(fc);
     Value v2(bc);
 
@@ -59,6 +60,8 @@ void testKV() {
     assert(kv->size_ == 2);
     assert(kv->keys_[1]->equals(k2));
     assert(kv->vals_[0]->vals->useful_get_type == 'F');
+    assert(kv->get(k1)->columns_ == 1);
+    assert(kv->get(k1)->schema_->cols_ == 'F');
 
 }
 
