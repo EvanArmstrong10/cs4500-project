@@ -34,10 +34,8 @@ We can also create a DataFrame, store it in a single Key/Value pair, perform and
 Data is not yet distributed or duplicated across nodes.
  
 ## Open questions
-Which features of the Application will be built in to the system versus user built?
 How will data concurrency be ensured across nodes?
 Who has ownership of the DataFrame?
-How do we determine how the DataFrame is chunked into KV pairs?
 
 
 ## Status
