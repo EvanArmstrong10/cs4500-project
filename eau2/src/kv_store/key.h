@@ -17,10 +17,11 @@ class Key {
         }
 
         ~Key() {
-
+            delete name;
         }
 
         bool equals(Key* k) {
             return (strcmp(k->name, name) == 0) && node == k->node;
         }
+
 };

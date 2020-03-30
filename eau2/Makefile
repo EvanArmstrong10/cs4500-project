@@ -10,8 +10,8 @@ test:
 	tests/test_serialize.cpp
 	tests/test_sorer -f data/datafile.txt
 	
-
 valgrind:
+	valgrind --leak-check=full ./main.out
 
 clean:
 	rm tests/test_serialize

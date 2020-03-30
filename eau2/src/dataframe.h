@@ -182,16 +182,6 @@ class DataFrame : public Object {
         return data_[col]->as_string()->get(row);
     }
 
-    /** Return the offset of the given column name or -1 if no such col. */
-    int get_col(String& col) {
-        return schema_->col_idx(col.c_str());
-    }
-
-    /** Return the offset of the given row name or -1 if no such row. */
-    int get_row(String& col) {
-        return schema_->row_idx(col.c_str());
-    }
-
     /** Set the value at the given column and row to the given value.
      * If the column is not  of the right type or the indices are out of
      * bound, the result is undefined. */
